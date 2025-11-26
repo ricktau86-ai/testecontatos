@@ -498,7 +498,153 @@
         text-align: center;
       }
     }
-  </style>
+  
+  /* Modais para criação/edição de contactos e viaturas */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 60;
+  }
+
+  .modal-overlay.visible {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--bg-elevated, #020617);
+    border-radius: 16px;
+    padding: 16px 16px 12px;
+    max-width: 420px;
+    width: calc(100% - 32px);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.45);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .modal-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .modal-close {
+    border: none;
+    background: none;
+    color: var(--muted, #94a3b8);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 2px 4px;
+  }
+
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: min(420px, 70vh);
+    overflow-y: auto;
+    margin-top: 4px;
+  }
+
+  .modal-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .modal-row-inline {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.4fr);
+    gap: 6px;
+  }
+
+  .modal-row label {
+    font-size: 0.75rem;
+    color: var(--muted, #94a3b8);
+  }
+
+  .modal-row input,
+  .modal-row select {
+    border-radius: 999px;
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    background: rgba(15, 23, 42, 0.85);
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    color: #e5e7eb;
+    outline: none;
+  }
+
+  .modal-row input:focus,
+  .modal-row select:focus {
+    border-color: var(--accent, #38bdf8);
+    box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3);
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .btn-secondary,
+  .btn-primary {
+    border-radius: 999px;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--muted, #94a3b8);
+    border-color: rgba(71, 85, 105, 0.9);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(15, 23, 42, 0.85);
+  }
+
+  .btn-primary {
+    background: var(--accent, #38bdf8);
+    color: #0b1120;
+    border-color: transparent;
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.05);
+  }
+
+  .modal-row .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #e5e7eb;
+  }
+
+  .modal-row .checkbox-row input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+  }
+
+  @media (min-width: 768px) {
+    .modal {
+      max-width: 480px;
+    }
+  }
+</style>
 </head>
 <body>
   <div class="app">
@@ -510,7 +656,7 @@
         </h1>
       </div>
       <div class="badge">
-        Versão tudo-em-um · Ideal para Android
+        Versão Android
       </div>
     </header>
 
@@ -610,6 +756,151 @@
     </div>
 
     <div id="toast" class="toast"></div>
+    <!-- Modais de criação/edição -->
+    <div id="contactModalOverlay" class="modal-overlay" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+        <div class="modal-header">
+          <h2 id="contactModalTitle" class="modal-title">Novo contacto</h2>
+          <button type="button" class="modal-close" id="contactModalCloseBtn" aria-label="Fechar">
+            &times;
+          </button>
+        </div>
+        <form id="contactForm">
+          <div class="modal-body">
+            <div class="modal-row">
+              <label for="contactNome">Nome</label>
+              <input id="contactNome" name="nome" type="text" required />
+            </div>
+            <div class="modal-row">
+              <label for="contactOrigem">Origem (Motorista/Ajudante, Loja, Escritório...)</label>
+              <input id="contactOrigem" name="origem" type="text" />
+            </div>
+            <div class="modal-row">
+              <label for="contactCategoria">Categoria / função</label>
+              <input id="contactCategoria" name="categoria" type="text" />
+            </div>
+            <div class="modal-row">
+              <label for="contactLocal">Local</label>
+              <input id="contactLocal" name="local" type="text" />
+            </div>
+            <div class="modal-row">
+              <label for="contactEmail">Email</label>
+              <input id="contactEmail" name="email" type="email" />
+            </div>
+            <div class="modal-row modal-row-inline">
+              <div>
+                <label for="contactPhone1Label">Telefone 1 - label</label>
+                <input id="contactPhone1Label" name="phone1Label" type="text" placeholder="Telemóvel / Trabalho..." />
+              </div>
+              <div>
+                <label for="contactPhone1Number">Telefone 1 - número</label>
+                <input id="contactPhone1Number" name="phone1Number" type="tel" />
+              </div>
+            </div>
+            <div class="modal-row modal-row-inline">
+              <div>
+                <label for="contactPhone2Label">Telefone 2 - label</label>
+                <input id="contactPhone2Label" name="phone2Label" type="text" />
+              </div>
+              <div>
+                <label for="contactPhone2Number">Telefone 2 - número</label>
+                <input id="contactPhone2Number" name="phone2Number" type="tel" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" id="contactModalCancelBtn">Cancelar</button>
+            <button type="submit" class="btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="vehicleModalOverlay" class="modal-overlay" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="vehicleModalTitle">
+        <div class="modal-header">
+          <h2 id="vehicleModalTitle" class="modal-title">Nova viatura</h2>
+          <button type="button" class="modal-close" id="vehicleModalCloseBtn" aria-label="Fechar">
+            &times;
+          </button>
+        </div>
+        <form id="vehicleForm">
+          <div class="modal-body">
+            <div class="modal-row">
+              <label for="vehicleMatricula">Matrícula</label>
+              <input id="vehicleMatricula" name="matricula" type="text" required />
+            </div>
+            <div class="modal-row modal-row-inline">
+              <div>
+                <label for="vehicleMarca">Marca</label>
+                <input id="vehicleMarca" name="marca" type="text" />
+              </div>
+              <div>
+                <label for="vehicleModelo">Modelo</label>
+                <input id="vehicleModelo" name="modelo" type="text" />
+              </div>
+            </div>
+            <div class="modal-row modal-row-inline">
+              <div>
+                <label for="vehicleTipo">Tipo</label>
+                <input id="vehicleTipo" name="tipo" type="text" placeholder="Pesado, Ligeiro..." />
+              </div>
+              <div>
+                <label for="vehicleCaixaTipo">Tipo de caixa</label>
+                <input id="vehicleCaixaTipo" name="caixa_tipo" type="text" placeholder="Frigorífica, Cortinas..." />
+              </div>
+            </div>
+            <div class="modal-row">
+              <label for="vehicleDimensoes">Dimensões (C x L x A)</label>
+              <input id="vehicleDimensoes" name="dimensoes" type="text" />
+            </div>
+            <div class="modal-row modal-row-inline">
+              <div>
+                <label for="vehiclePesoBruto">Peso bruto</label>
+                <input id="vehiclePesoBruto" name="peso_bruto" type="text" />
+              </div>
+              <div>
+                <label for="vehicleCargaUtil">Carga útil</label>
+                <input id="vehicleCargaUtil" name="carga_util" type="text" />
+              </div>
+            </div>
+            <div class="modal-row modal-row-inline">
+              <div>
+                <label for="vehiclePaletes">N.º europaletes</label>
+                <input id="vehiclePaletes" name="paletes" type="text" />
+              </div>
+              <div>
+                <label for="vehicleBiTemp">Bi-temperatura</label>
+                <select id="vehicleBiTemp" name="bi_temperatura">
+                  <option value="">(desconhecido)</option>
+                  <option value="true">Sim</option>
+                  <option value="false">Não</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-row">
+              <label for="vehicleTipologia">Tipologia de serviço</label>
+              <input id="vehicleTipologia" name="tipologia_servico" type="text" />
+            </div>
+            <div class="modal-row">
+              <div class="checkbox-row">
+                <input id="vehicleDivisoria" name="divisoria" type="checkbox" />
+                <label for="vehicleDivisoria">Divisória</label>
+              </div>
+              <div class="checkbox-row">
+                <input id="vehicleColchao" name="colchao" type="checkbox" />
+                <label for="vehicleColchao">Colchão</label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" id="vehicleModalCancelBtn">Cancelar</button>
+            <button type="submit" class="btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
   </div>
 
   <!-- 1) COLAR AQUI OS DADOS DE CONTACTOS -->
@@ -637,7 +928,36 @@
     */
   </script>
 
-  <!-- 3) LÓGICA DA APP (tabs, filtros, renderização, copy) -->
+  
+  <!-- Firebase (base de dados online partilhada) -->
+  <!-- 1) Configuração já preenchida com o projeto TMB -->
+  <!-- 2) Sem login, todos podem LER (se as rules permitirem); login admin permite ESCREVER -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDnxLSht3xWenuCVKNKDc4FNNxKdXJ2a-w",
+      authDomain: "tmb-app-6db78.firebaseapp.com",
+      projectId: "tmb-app-6db78",
+      storageBucket: "tmb-app-6db78.firebasestorage.app",
+      messagingSenderId: "542765304416",
+      appId: "1:542765304416:web:608a46f6bdfdce4fa6d105",
+      measurementId: "G-P80K08P0VG"
+    };
+
+    let _tmbDb = null;
+    try {
+      const app = firebase.initializeApp(firebaseConfig);
+      _tmbDb = firebase.firestore();
+      console.log("Firebase inicializado.");
+    } catch (e) {
+      console.warn("Erro ao inicializar Firebase:", e);
+      _tmbDb = null;
+    }
+  </script>
+
+<!-- 3) LÓGICA DA APP (tabs, filtros, renderização, copy) -->
   <script>
     // Fallback caso ainda não tenhas colado os arrays
     if (typeof CONTACTS === "undefined") {
@@ -646,6 +966,16 @@
     if (typeof VEHICLES === "undefined") {
       window.VEHICLES = [];
     }
+
+    // Referência à base de dados online (se Firebase estiver ok)
+    let db = typeof _tmbDb !== "undefined" ? _tmbDb : null;
+
+    // Flags para seed inicial online (se necessário)
+    let contactsSeedDone = false;
+    let vehiclesSeedDone = false;
+
+    // Estado de admin (login) - controla se pode escrever online
+    let isAdmin = false;
 
     // Tabs
     const tabButtons = document.querySelectorAll(".tab-btn");
@@ -705,6 +1035,259 @@
     let activeOrigem = "todos";
     let currentTermContacts = "";
 
+    const STORAGE_KEY_CONTACTS = "tmb_contacts_v2";
+    let contactsData = [];
+
+    let editingContact = null;
+
+    const contactModalOverlay = document.getElementById("contactModalOverlay");
+    const contactForm = document.getElementById("contactForm");
+    const contactModalTitle = document.getElementById("contactModalTitle");
+    const contactModalCloseBtn = document.getElementById("contactModalCloseBtn");
+    const contactModalCancelBtn = document.getElementById("contactModalCancelBtn");
+
+    const inputContactNome = document.getElementById("contactNome");
+    const inputContactOrigem = document.getElementById("contactOrigem");
+    const inputContactCategoria = document.getElementById("contactCategoria");
+    const inputContactLocal = document.getElementById("contactLocal");
+    const inputContactEmail = document.getElementById("contactEmail");
+    const inputContactPhone1Label = document.getElementById("contactPhone1Label");
+    const inputContactPhone1Number = document.getElementById("contactPhone1Number");
+    const inputContactPhone2Label = document.getElementById("contactPhone2Label");
+    const inputContactPhone2Number = document.getElementById("contactPhone2Number");
+
+    function openContactModal(contact) {
+      editingContact = contact || null;
+      if (contactModalTitle) {
+        contactModalTitle.textContent = contact ? "Editar contacto" : "Novo contacto";
+      }
+
+      const base =
+        contact || {
+          origem: "Motorista/Ajudante",
+          nome: "",
+          categoria: "",
+          local: "",
+          email: "",
+          telefones: [],
+        };
+
+      if (inputContactNome) inputContactNome.value = base.nome || "";
+      if (inputContactOrigem)
+        inputContactOrigem.value = base.origem || "Motorista/Ajudante";
+      if (inputContactCategoria)
+        inputContactCategoria.value = base.categoria || "";
+      if (inputContactLocal) inputContactLocal.value = base.local || "";
+      if (inputContactEmail) inputContactEmail.value = base.email || "";
+
+      let phone1 = null;
+      let phone2 = null;
+      if (Array.isArray(base.telefones)) {
+        phone1 = base.telefones[0] || null;
+        phone2 = base.telefones[1] || null;
+      }
+
+      if (inputContactPhone1Label)
+        inputContactPhone1Label.value = (phone1 && phone1.label) || "";
+      if (inputContactPhone1Number)
+        inputContactPhone1Number.value = (phone1 && phone1.numero) || "";
+      if (inputContactPhone2Label)
+        inputContactPhone2Label.value = (phone2 && phone2.label) || "";
+      if (inputContactPhone2Number)
+        inputContactPhone2Number.value = (phone2 && phone2.numero) || "";
+
+      if (contactModalOverlay) {
+        contactModalOverlay.classList.add("visible");
+        contactModalOverlay.setAttribute("aria-hidden", "false");
+      }
+
+      if (inputContactNome) {
+        setTimeout(() => inputContactNome.focus(), 10);
+      }
+    }
+
+    function closeContactModal() {
+      if (contactModalOverlay) {
+        contactModalOverlay.classList.remove("visible");
+        contactModalOverlay.setAttribute("aria-hidden", "true");
+      }
+      if (contactForm) {
+        contactForm.reset();
+      }
+      editingContact = null;
+    }
+
+    if (contactModalOverlay) {
+      contactModalOverlay.addEventListener("click", (e) => {
+        if (e.target === contactModalOverlay) {
+          closeContactModal();
+        }
+      });
+    }
+
+    if (contactModalCloseBtn) {
+      contactModalCloseBtn.addEventListener("click", () => {
+        closeContactModal();
+      });
+    }
+
+    if (contactModalCancelBtn) {
+      contactModalCancelBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeContactModal();
+      });
+    }
+
+    if (contactForm) {
+      contactForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!inputContactNome) return;
+
+        const nome = (inputContactNome.value || "").trim();
+        if (!nome) {
+          showToast("O nome é obrigatório.");
+          inputContactNome.focus();
+          return;
+        }
+
+        const origem = (
+          (inputContactOrigem && inputContactOrigem.value) ||
+          "Motorista/Ajudante"
+        ).trim();
+
+        const categoria = (inputContactCategoria && inputContactCategoria.value) || "";
+        const local = (inputContactLocal && inputContactLocal.value) || "";
+        const email = (inputContactEmail && inputContactEmail.value) || "";
+
+        const phone1Label =
+          (inputContactPhone1Label && inputContactPhone1Label.value) || "";
+        const phone1Number =
+          (inputContactPhone1Number && inputContactPhone1Number.value) || "";
+        const phone2Label =
+          (inputContactPhone2Label && inputContactPhone2Label.value) || "";
+        const phone2Number =
+          (inputContactPhone2Number && inputContactPhone2Number.value) || "";
+
+        const phones = [];
+        if (phone1Number.trim()) {
+          phones.push({
+            label: phone1Label.trim() || "Telefone",
+            numero: phone1Number.trim(),
+          });
+        }
+        if (phone2Number.trim()) {
+          phones.push({
+            label: phone2Label.trim() || "Telefone",
+            numero: phone2Number.trim(),
+          });
+        }
+
+        const newContact = {
+          origem,
+          nome,
+          categoria: categoria.trim(),
+          local: local.trim(),
+          email: email.trim(),
+          telefones: phones,
+        };
+
+        const isEditing = !!editingContact;
+
+        // Se existir Firestore e estivermos em modo admin, escreve online
+        if (db && isAdmin) {
+          const col = db.collection("contacts");
+          if (isEditing && editingContact && editingContact.id) {
+            col
+              .doc(editingContact.id)
+              .set(newContact)
+              .then(() => {
+                closeContactModal();
+                showToast("Contacto atualizado (online).");
+              })
+              .catch((e) => {
+                console.error(e);
+                showToast("Erro ao guardar contacto online.");
+              });
+          } else {
+            col
+              .add(newContact)
+              .then(() => {
+                closeContactModal();
+                showToast("Contacto criado (online).");
+              })
+              .catch((e) => {
+                console.error(e);
+                showToast("Erro ao criar contacto online.");
+              });
+          }
+          return;
+        }
+
+        // Se não for admin mas existir Firestore, bloqueia escrita
+        if (db && !isAdmin) {
+          showToast("Modo só leitura. Faça login como admin para guardar online.");
+          return;
+        }
+
+        // Sem Firestore: mantém comportamento local
+        if (isEditing) {
+          const idx = contactsData.indexOf(editingContact);
+          if (idx !== -1) {
+            contactsData[idx] = newContact;
+          }
+        } else {
+          contactsData.push(newContact);
+        }
+
+        saveContactsData();
+        applyFiltersContacts();
+        closeContactModal();
+        showToast(isEditing ? "Contacto atualizado." : "Contacto criado.");
+      });
+    }
+
+    function cloneContactsFromConst() {
+      if (!Array.isArray(CONTACTS)) return [];
+      return CONTACTS.map((c) => ({
+        origem: c.origem || "",
+        nome: c.nome || "",
+        categoria: c.categoria || "",
+        local: c.local || "",
+        email: c.email || "",
+        telefones: Array.isArray(c.telefones)
+          ? c.telefones.map((p) => ({
+              label: (p && p.label) || "",
+              numero: (p && p.numero) || "",
+            }))
+          : [],
+      }));
+    }
+
+    function loadContactsData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_CONTACTS);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+      return cloneContactsFromConst();
+    }
+
+    function saveContactsData() {
+      try {
+        localStorage.setItem(STORAGE_KEY_CONTACTS, JSON.stringify(contactsData));
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    contactsData = loadContactsData();
+
     function normalizePhone(num) {
       return (num || "").replace(/\s+/g, "");
     }
@@ -721,12 +1304,10 @@
       ];
       if (Array.isArray(contact.telefones)) {
         contact.telefones.forEach((p) => {
-          fields.push(p.numero, p.label);
+          fields.push(p && p.numero, p && p.label);
         });
       }
-      return fields.some(
-        (v) => v && v.toString().toLowerCase().includes(t)
-      );
+      return fields.some((v) => v && v.toString().toLowerCase().includes(t));
     }
 
     function matchesOrigemContact(contact, origem) {
@@ -748,83 +1329,150 @@
         const card = document.createElement("article");
         card.className = "contact-card";
 
-        const nome = contact.nome || "Sem nome";
-        const categoria = contact.categoria || "";
+        const nome = contact.nome || "(sem nome)";
         const origem = contact.origem || "";
+        const categoria = contact.categoria || "";
         const local = contact.local || "";
-        const email = contact.email || "";
+        const email =
+          contact.email && contact.email !== "nan" ? contact.email : "";
 
-        card.innerHTML = `
-          <div class="card-header">
-            <div>
-              <h2>${nome}</h2>
-              <div class="pill-row">
-                ${
-                  origem
-                    ? `<span class="pill pill--origem">${origem}</span>`
-                    : ""
-                }
-                ${
-                  categoria
-                    ? `<span class="pill">${categoria}</span>`
-                    : ""
-                }
-              </div>
-            </div>
-            <button class="copy-btn" type="button" title="Copiar cartão">
-              <i class="fa-regular fa-copy"></i>
-            </button>
-          </div>
-          <div class="card-body">
-            ${
-              local
-                ? `
-              <div class="line">
-                <i class="fa-solid fa-location-dot"></i>
-                <span>${local}</span>
-              </div>
-            `
-                : ""
-            }
-            ${
-              email
-                ? `
-              <div class="line">
-                <i class="fa-solid fa-envelope"></i>
-                <a href="mailto:${email}">${email}</a>
-              </div>
-            `
-                : ""
-            }
-            ${
-              Array.isArray(contact.telefones) &&
-              contact.telefones.length
-                ? `
-              <div class="phones">
-                ${contact.telefones
-                  .map(
-                    (p) => `
-                  <p class="phone-line">
-                    <span class="phone-label">${p.label || ""}</span>
-                    <a href="tel:${normalizePhone(
-                      p.numero || ""
-                    )}" class="phone-number">
-                      <i class="fa-solid fa-phone"></i>
-                      <span>${p.numero || ""}</span>
-                    </a>
-                  </p>
-                `
-                  )
-                  .join("")}
-              </div>
-            `
-                : ""
-            }
-          </div>
-        `;
+        // header
+        const header = document.createElement("div");
+        header.className = "card-header";
 
-        const copyBtn = card.querySelector(".copy-btn");
+        const headerLeft = document.createElement("div");
+
+        const h2 = document.createElement("h2");
+        h2.textContent = nome;
+        headerLeft.appendChild(h2);
+
+        const pillRow = document.createElement("div");
+        pillRow.className = "pill-row";
+        if (origem) {
+          const origemPill = document.createElement("span");
+          origemPill.className = "pill pill--origem";
+          origemPill.textContent = origem;
+          pillRow.appendChild(origemPill);
+        }
+        if (categoria) {
+          const catPill = document.createElement("span");
+          catPill.className = "pill";
+          catPill.textContent = categoria;
+          pillRow.appendChild(catPill);
+        }
+        headerLeft.appendChild(pillRow);
+
+        const copyBtn = document.createElement("button");
+        copyBtn.type = "button";
+        copyBtn.className = "copy-btn";
+        copyBtn.title = "Copiar cartão";
+        const copyIcon = document.createElement("i");
+        copyIcon.className = "fa-regular fa-copy";
+        copyBtn.appendChild(copyIcon);
         copyBtn.addEventListener("click", () => copyContact(contact));
+
+        header.appendChild(headerLeft);
+        header.appendChild(copyBtn);
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        if (local) {
+          const line = document.createElement("div");
+          line.className = "line";
+          const icon = document.createElement("i");
+          icon.className = "fa-solid fa-location-dot";
+          const span = document.createElement("span");
+          span.textContent = local;
+          line.appendChild(icon);
+          line.appendChild(span);
+          body.appendChild(line);
+        }
+
+        if (email) {
+          const line = document.createElement("div");
+          line.className = "line";
+          const icon = document.createElement("i");
+          icon.className = "fa-solid fa-envelope";
+          const link = document.createElement("a");
+          link.href = "mailto:" + email;
+          link.textContent = email;
+          line.appendChild(icon);
+          line.appendChild(link);
+          body.appendChild(line);
+        }
+
+        if (Array.isArray(contact.telefones) && contact.telefones.length) {
+          const phonesDiv = document.createElement("div");
+          phonesDiv.className = "phones";
+          contact.telefones.forEach((p) => {
+            if (!p || !p.numero) return;
+            const line = document.createElement("p");
+            line.className = "phone-line";
+
+            const labelSpan = document.createElement("span");
+            labelSpan.className = "phone-label";
+            labelSpan.textContent = p.label || "";
+            line.appendChild(labelSpan);
+
+            const link = document.createElement("a");
+            link.className = "phone-number";
+            link.href = "tel:" + normalizePhone(p.numero || "");
+            const phoneIcon = document.createElement("i");
+            phoneIcon.className = "fa-solid fa-phone";
+            const numSpan = document.createElement("span");
+            numSpan.textContent = p.numero || "";
+            link.appendChild(phoneIcon);
+            link.appendChild(numSpan);
+
+            line.appendChild(link);
+            phonesDiv.appendChild(line);
+          });
+          body.appendChild(phonesDiv);
+        }
+
+        // edit/delete line
+        const actionsLine = document.createElement("div");
+        actionsLine.className = "line";
+        actionsLine.style.marginTop = "6px";
+        actionsLine.style.justifyContent = "flex-end";
+        actionsLine.style.gap = "8px";
+        actionsLine.style.fontSize = "0.75rem";
+
+        const editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "contact-edit-btn";
+        editBtn.textContent = "Editar";
+        editBtn.style.border = "none";
+        editBtn.style.background = "none";
+        editBtn.style.color = "var(--accent)";
+        editBtn.style.cursor = "pointer";
+        editBtn.style.padding = "0";
+        editBtn.addEventListener("click", () => editContact(contact));
+
+        const middleDot = document.createElement("span");
+        middleDot.textContent = "•";
+        middleDot.style.color = "var(--muted)";
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "contact-delete-btn";
+        deleteBtn.textContent = "Apagar";
+        deleteBtn.style.border = "none";
+        deleteBtn.style.background = "none";
+        deleteBtn.style.color = "#fb7185";
+        deleteBtn.style.cursor = "pointer";
+        deleteBtn.style.padding = "0";
+        deleteBtn.addEventListener("click", () => deleteContact(contact));
+
+        actionsLine.appendChild(editBtn);
+        actionsLine.appendChild(middleDot);
+        actionsLine.appendChild(deleteBtn);
+        body.appendChild(actionsLine);
+
+        card.appendChild(header);
+        card.appendChild(body);
+
         frag.appendChild(card);
       });
 
@@ -836,8 +1484,7 @@
       const lines = [];
       if (contact.nome) lines.push("Nome: " + contact.nome);
       if (contact.origem) lines.push("Origem: " + contact.origem);
-      if (contact.categoria)
-        lines.push("Categoria: " + contact.categoria);
+      if (contact.categoria) lines.push("Categoria: " + contact.categoria);
       if (contact.local) lines.push("Local: " + contact.local);
       if (contact.email) lines.push("Email: " + contact.email);
       if (Array.isArray(contact.telefones)) {
@@ -859,27 +1506,77 @@
       }
     }
 
-    function applyFiltersContacts() {
-      if (!Array.isArray(CONTACTS) || !CONTACTS.length) {
-        cardsContacts.innerHTML =
-          '<p class="no-results">Nenhum contacto carregado. Verifica se colaste o array CONTACTS.</p>';
-        summaryContacts.textContent = "";
+    
+    function createOrEditContact(existing) {
+      openContactModal(existing || null);
+    }
+function editContact(contact) {
+      if (!contact) return;
+      createOrEditContact(contact);
+    }
+
+    function deleteContact(contact) {
+      if (!contact) return;
+      const ok = confirm("Tem a certeza que quer apagar este contacto?");
+      if (!ok) return;
+
+      // Firestore + admin -> apagar online
+      if (db && isAdmin && contact.id) {
+        db.collection("contacts")
+          .doc(contact.id)
+          .delete()
+          .then(() => {
+            showToast("Contacto apagado (online).");
+          })
+          .catch((e) => {
+            console.error(e);
+            showToast("Erro ao apagar contacto online.");
+          });
         return;
       }
-      const filtered = CONTACTS.filter(
+
+      // Firestore mas sem admin -> bloqueia
+      if (db && !isAdmin) {
+        showToast("Modo só leitura. Faça login como admin para apagar online.");
+        return;
+      }
+
+      // Sem Firestore: comportamento local
+      const idx = contactsData.indexOf(contact);
+      if (idx === -1) return;
+      contactsData.splice(idx, 1);
+      saveContactsData();
+      applyFiltersContacts();
+      showToast("Contacto apagado.");
+    }
+
+    function applyFiltersContacts() {
+      if (!Array.isArray(contactsData) || !contactsData.length) {
+        cardsContacts.innerHTML =
+          '<p class="no-results">Nenhum contacto carregado. Verifica se colaste o array CONTACTS.</p>';
+        if (summaryContacts) summaryContacts.textContent = "";
+        return;
+      }
+      const filtered = contactsData.filter(
         (c) =>
           matchesOrigemContact(c, activeOrigem) &&
           matchesTermContact(c, currentTermContacts)
       );
       renderContacts(filtered);
-      const total = CONTACTS.length;
+      const total = contactsData.length;
       const n = filtered.length;
-      if (!currentTermContacts && activeOrigem === "todos") {
-        summaryContacts.textContent = "A mostrar " + n + " contactos.";
-      } else {
-        summaryContacts.textContent =
-          "A mostrar " + n + " de " + total + " contactos.";
+      if (summaryContacts) {
+        if (!currentTermContacts && activeOrigem === "todos") {
+          summaryContacts.textContent = "A mostrar " + n + " contactos.";
+        } else {
+          summaryContacts.textContent =
+            "A mostrar " + n + " de " + total + " contactos.";
+        }
       }
+    }
+
+    function addContact() {
+      createOrEditContact(null);
     }
 
     if (searchContactsInput) {
@@ -898,7 +1595,31 @@
       });
     });
 
-    /* ===========================
+    // botão "Novo contacto" na barra superior
+    const contactsTopBar = document.querySelector("#tab-contactos .top-bar");
+    if (contactsTopBar) {
+      const btnAdd = document.createElement("button");
+      btnAdd.type = "button";
+      btnAdd.id = "btnAddContact";
+      btnAdd.innerHTML =
+        '<i class="fa-solid fa-user-plus"></i><span style="margin-left:6px;">Novo contacto</span>';
+      btnAdd.style.borderRadius = "999px";
+      btnAdd.style.border = "1px solid var(--accent-strong)";
+      btnAdd.style.background = "var(--accent-soft)";
+      btnAdd.style.color = "var(--accent)";
+      btnAdd.style.padding = "6px 10px";
+      btnAdd.style.fontSize = "0.8rem";
+      btnAdd.style.display = "inline-flex";
+      btnAdd.style.alignItems = "center";
+      btnAdd.style.gap = "4px";
+      btnAdd.style.cursor = "pointer";
+      btnAdd.style.whiteSpace = "nowrap";
+      contactsTopBar.appendChild(btnAdd);
+
+      btnAdd.addEventListener("click", () => addContact());
+    }
+
+/* ===========================
        VIATURAS
     ============================ */
 
@@ -909,8 +1630,293 @@
       document.querySelectorAll("#chipGroupVehicles .chip")
     );
 
+    const STORAGE_KEY_VEHICLES = "tmb_vehicles_v2";
     let activeCaixa = "todas";
     let currentTermVehicles = "";
+    let vehiclesData = [];
+
+    let editingVehicle = null;
+
+    const vehicleModalOverlay = document.getElementById("vehicleModalOverlay");
+    const vehicleForm = document.getElementById("vehicleForm");
+    const vehicleModalTitle = document.getElementById("vehicleModalTitle");
+    const vehicleModalCloseBtn = document.getElementById("vehicleModalCloseBtn");
+    const vehicleModalCancelBtn = document.getElementById("vehicleModalCancelBtn");
+
+    const inputVehicleMatricula = document.getElementById("vehicleMatricula");
+    const inputVehicleMarca = document.getElementById("vehicleMarca");
+    const inputVehicleModelo = document.getElementById("vehicleModelo");
+    const inputVehicleTipo = document.getElementById("vehicleTipo");
+    const inputVehicleCaixaTipo = document.getElementById("vehicleCaixaTipo");
+    const inputVehicleDimensoes = document.getElementById("vehicleDimensoes");
+    const inputVehiclePesoBruto = document.getElementById("vehiclePesoBruto");
+    const inputVehicleCargaUtil = document.getElementById("vehicleCargaUtil");
+    const inputVehiclePaletes = document.getElementById("vehiclePaletes");
+    const inputVehicleBiTemp = document.getElementById("vehicleBiTemp");
+    const inputVehicleTipologia = document.getElementById("vehicleTipologia");
+    const inputVehicleDivisoria = document.getElementById("vehicleDivisoria");
+    const inputVehicleColchao = document.getElementById("vehicleColchao");
+
+    function openVehicleModal(vehicle) {
+      editingVehicle = vehicle || null;
+      if (vehicleModalTitle) {
+        vehicleModalTitle.textContent = vehicle ? "Editar viatura" : "Nova viatura";
+      }
+
+      const base =
+        vehicle || {
+          matricula: "",
+          marca: "",
+          modelo: "",
+          tipo: "",
+          caixa_tipo: "",
+          dimensoes: "",
+          peso_bruto: "",
+          carga_util: "",
+          paletes: "",
+          tipologia_servico: "",
+          bi_temperatura: null,
+          divisoria: false,
+          colchao: false,
+        };
+
+      if (inputVehicleMatricula)
+        inputVehicleMatricula.value = base.matricula || "";
+      if (inputVehicleMarca) inputVehicleMarca.value = base.marca || "";
+      if (inputVehicleModelo) inputVehicleModelo.value = base.modelo || "";
+      if (inputVehicleTipo) inputVehicleTipo.value = base.tipo || "";
+      if (inputVehicleCaixaTipo)
+        inputVehicleCaixaTipo.value = base.caixa_tipo || "";
+      if (inputVehicleDimensoes)
+        inputVehicleDimensoes.value = base.dimensoes || "";
+      if (inputVehiclePesoBruto)
+        inputVehiclePesoBruto.value = base.peso_bruto || "";
+      if (inputVehicleCargaUtil)
+        inputVehicleCargaUtil.value = base.carga_util || "";
+      if (inputVehiclePaletes)
+        inputVehiclePaletes.value =
+          base.paletes != null && base.paletes !== ""
+            ? String(base.paletes)
+            : "";
+
+      if (inputVehicleTipologia)
+        inputVehicleTipologia.value = base.tipologia_servico || "";
+
+      if (inputVehicleBiTemp) {
+        if (base.bi_temperatura === true) {
+          inputVehicleBiTemp.value = "true";
+        } else if (base.bi_temperatura === false) {
+          inputVehicleBiTemp.value = "false";
+        } else {
+          inputVehicleBiTemp.value = "";
+        }
+      }
+
+      if (inputVehicleDivisoria)
+        inputVehicleDivisoria.checked = !!base.divisoria;
+      if (inputVehicleColchao)
+        inputVehicleColchao.checked = !!base.colchao;
+
+      if (vehicleModalOverlay) {
+        vehicleModalOverlay.classList.add("visible");
+        vehicleModalOverlay.setAttribute("aria-hidden", "false");
+      }
+
+      if (inputVehicleMatricula) {
+        setTimeout(() => inputVehicleMatricula.focus(), 10);
+      }
+    }
+
+    function closeVehicleModal() {
+      if (vehicleModalOverlay) {
+        vehicleModalOverlay.classList.remove("visible");
+        vehicleModalOverlay.setAttribute("aria-hidden", "true");
+      }
+      if (vehicleForm) {
+        vehicleForm.reset();
+      }
+      editingVehicle = null;
+    }
+
+    if (vehicleModalOverlay) {
+      vehicleModalOverlay.addEventListener("click", (e) => {
+        if (e.target === vehicleModalOverlay) {
+          closeVehicleModal();
+        }
+      });
+    }
+
+    if (vehicleModalCloseBtn) {
+      vehicleModalCloseBtn.addEventListener("click", () => {
+        closeVehicleModal();
+      });
+    }
+
+    if (vehicleModalCancelBtn) {
+      vehicleModalCancelBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeVehicleModal();
+      });
+    }
+
+    if (vehicleForm) {
+      vehicleForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!inputVehicleMatricula) return;
+
+        const matricula = (inputVehicleMatricula.value || "").trim().toUpperCase();
+        if (!matricula) {
+          showToast("A matrícula é obrigatória.");
+          inputVehicleMatricula.focus();
+          return;
+        }
+
+        const marca = (inputVehicleMarca && inputVehicleMarca.value) || "";
+        const modelo = (inputVehicleModelo && inputVehicleModelo.value) || "";
+        const tipo = (inputVehicleTipo && inputVehicleTipo.value) || "";
+        const caixa_tipo =
+          (inputVehicleCaixaTipo && inputVehicleCaixaTipo.value) || "";
+        const dimensoes =
+          (inputVehicleDimensoes && inputVehicleDimensoes.value) || "";
+        const peso_bruto =
+          (inputVehiclePesoBruto && inputVehiclePesoBruto.value) || "";
+        const carga_util =
+          (inputVehicleCargaUtil && inputVehicleCargaUtil.value) || "";
+        const paletesStr =
+          (inputVehiclePaletes && inputVehiclePaletes.value) || "";
+        const tipologia_servico =
+          (inputVehicleTipologia && inputVehicleTipologia.value) || "";
+
+        let bi_temperatura = null;
+        if (inputVehicleBiTemp) {
+          if (inputVehicleBiTemp.value === "true") bi_temperatura = true;
+          else if (inputVehicleBiTemp.value === "false")
+            bi_temperatura = false;
+        }
+
+        const divisoria =
+          inputVehicleDivisoria && inputVehicleDivisoria.checked;
+        const colchao = inputVehicleColchao && inputVehicleColchao.checked;
+
+        const newVehicle = {
+          matricula,
+          marca: marca.trim(),
+          modelo: modelo.trim(),
+          tipo: tipo.trim(),
+          caixa_tipo: caixa_tipo.trim(),
+          dimensoes: dimensoes.trim(),
+          peso_bruto: peso_bruto.trim(),
+          carga_util: carga_util.trim(),
+          paletes: paletesStr !== "" ? paletesStr.trim() : "",
+          tipologia_servico: tipologia_servico.trim(),
+          bi_temperatura,
+          divisoria,
+          colchao,
+        };
+
+        const isEditing = !!editingVehicle;
+
+        // Firestore + admin -> escreve online
+        if (db && isAdmin) {
+          const col = db.collection("vehicles");
+          if (isEditing && editingVehicle && editingVehicle.id) {
+            col
+              .doc(editingVehicle.id)
+              .set(newVehicle)
+              .then(() => {
+                closeVehicleModal();
+                showToast("Viatura atualizada (online).");
+              })
+              .catch((e) => {
+                console.error(e);
+                showToast("Erro ao guardar viatura online.");
+              });
+          } else {
+            col
+              .add(newVehicle)
+              .then(() => {
+                closeVehicleModal();
+                showToast("Viatura criada (online).");
+              })
+              .catch((e) => {
+                console.error(e);
+                showToast("Erro ao criar viatura online.");
+              });
+          }
+          return;
+        }
+
+        // Firestore mas sem admin -> bloqueia escrita
+        if (db && !isAdmin) {
+          showToast("Modo só leitura. Faça login como admin para guardar online.");
+          return;
+        }
+
+        // Sem Firestore: comportamento local
+        if (isEditing) {
+          const idx = vehiclesData.indexOf(editingVehicle);
+          if (idx !== -1) {
+            vehiclesData[idx] = newVehicle;
+          }
+        } else {
+          vehiclesData.push(newVehicle);
+        }
+
+        saveVehiclesData();
+        applyFiltersVehicles();
+        closeVehicleModal();
+        showToast(isEditing ? "Viatura atualizada." : "Viatura criada.");
+      });
+    }
+
+    function cloneVehiclesFromConst() {
+      if (!Array.isArray(VEHICLES)) return [];
+      return VEHICLES.map((v) => ({
+        matricula: v.matricula || "",
+        marca: v.marca || "",
+        modelo: v.modelo || "",
+        tipo: v.tipo || "",
+        caixa_tipo: v.caixa_tipo || "",
+        dimensoes: v.dimensoes || "",
+        peso_bruto: v.peso_bruto || "",
+        carga_util: v.carga_util || "",
+        paletes: v.paletes != null ? v.paletes : null,
+        tipologia_servico: v.tipologia_servico || "",
+        bi_temperatura:
+          v.bi_temperatura === true
+            ? true
+            : v.bi_temperatura === false
+            ? false
+            : null,
+        divisoria: !!v.divisoria,
+        colchao: !!v.colchao,
+      }));
+    }
+
+    function loadVehiclesData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_VEHICLES);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        // ignora erros
+      }
+      return cloneVehiclesFromConst();
+    }
+
+    function saveVehiclesData() {
+      try {
+        localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(vehiclesData));
+      } catch (e) {
+        // ignora erros
+      }
+    }
+
+    vehiclesData = loadVehiclesData();
 
     function normalizePlate(str) {
       return (str || "").toUpperCase();
@@ -958,6 +1964,7 @@
         const marcaModelo = [v.marca, v.modelo]
           .filter(Boolean)
           .join(" · ");
+
         const tempLabel =
           v.bi_temperatura === true
             ? "Bi-temperatura"
@@ -1019,7 +2026,7 @@
                   ? `
                 <div class="line">
                   <i class="fa-solid fa-weight-hanging"></i>
-                  <span>Peso bruto: <span class="value">${v.peso_bruto}</span> kg</span>
+                  <span>Peso bruto: <span class="value">${v.peso_bruto}</span></span>
                 </div>
               `
                   : ""
@@ -1029,13 +2036,13 @@
                   ? `
                 <div class="line">
                   <i class="fa-solid fa-boxes-stacked"></i>
-                  <span>Carga útil: <span class="value">${v.carga_util}</span> kg</span>
+                  <span>Carga útil: <span class="value">${v.carga_util}</span></span>
                 </div>
               `
                   : ""
               }
               ${
-                v.paletes != null
+                v.paletes != null && v.paletes !== ""
                   ? `
                 <div class="line">
                   <i class="fa-solid fa-layer-group"></i>
@@ -1055,11 +2062,37 @@
                   : ""
               }
             </div>
+            <div class="line" style="margin-top:6px; justify-content:flex-end; gap:8px; font-size:0.75rem;">
+              <button type="button"
+                      class="vehicle-edit-btn"
+                      style="border:none;background:none;color:var(--accent);cursor:pointer;padding:0;">
+                Editar
+              </button>
+              <span style="color:var(--muted)">•</span>
+              <button type="button"
+                      class="vehicle-delete-btn"
+                      style="border:none;background:none;color:#fb7185;cursor:pointer;padding:0;">
+                Apagar
+              </button>
+            </div>
           </div>
         `;
 
         const copyBtn = card.querySelector(".copy-btn");
-        copyBtn.addEventListener("click", () => copyVehicle(v));
+        if (copyBtn) {
+          copyBtn.addEventListener("click", () => copyVehicle(v));
+        }
+
+        const editBtn = card.querySelector(".vehicle-edit-btn");
+        if (editBtn) {
+          editBtn.addEventListener("click", () => editVehicle(v));
+        }
+
+        const deleteBtn = card.querySelector(".vehicle-delete-btn");
+        if (deleteBtn) {
+          deleteBtn.addEventListener("click", () => deleteVehicle(v));
+        }
+
         frag.appendChild(card);
       });
 
@@ -1078,7 +2111,7 @@
         lines.push("Dimensões (C x L x A): " + v.dimensoes);
       if (v.peso_bruto) lines.push("Peso bruto: " + v.peso_bruto);
       if (v.carga_util) lines.push("Carga útil: " + v.carga_util);
-      if (v.paletes != null)
+      if (v.paletes != null && v.paletes !== "")
         lines.push("N.º europaletes: " + v.paletes);
       if (v.tipologia_servico)
         lines.push("Tipologia de serviço: " + v.tipologia_servico);
@@ -1101,26 +2134,76 @@
     }
 
     function applyFiltersVehicles() {
-      if (!Array.isArray(VEHICLES) || !VEHICLES.length) {
+      if (!Array.isArray(vehiclesData) || !vehiclesData.length) {
         cardsVehicles.innerHTML =
           '<p class="no-results">Nenhuma viatura carregada. Verifica se colaste o array VEHICLES.</p>';
-        summaryVehicles.textContent = "";
+        if (summaryVehicles) summaryVehicles.textContent = "";
         return;
       }
-      const filtered = VEHICLES.filter(
+      const filtered = vehiclesData.filter(
         (v) =>
           matchesCaixa(v, activeCaixa) &&
           matchesTermVehicle(v, currentTermVehicles)
       );
       renderVehicles(filtered);
-      const total = VEHICLES.length;
+      const total = vehiclesData.length;
       const n = filtered.length;
       if (!currentTermVehicles && activeCaixa === "todas") {
-        summaryVehicles.textContent = "A mostrar " + n + " viaturas.";
+        if (summaryVehicles)
+          summaryVehicles.textContent = "A mostrar " + n + " viaturas.";
       } else {
-        summaryVehicles.textContent =
-          "A mostrar " + n + " de " + total + " viaturas.";
+        if (summaryVehicles)
+          summaryVehicles.textContent =
+            "A mostrar " + n + " de " + total + " viaturas.";
       }
+    }
+
+    
+    function createOrEditVehicle(existing) {
+      openVehicleModal(existing || null);
+    }
+function editVehicle(v) {
+      if (!v) return;
+      createOrEditVehicle(v);
+    }
+
+    function deleteVehicle(v) {
+      if (!v) return;
+      const ok = confirm("Tem a certeza que quer apagar esta viatura?");
+      if (!ok) return;
+
+      // Firestore + admin -> apagar online
+      if (db && isAdmin && v.id) {
+        db.collection("vehicles")
+          .doc(v.id)
+          .delete()
+          .then(() => {
+            showToast("Viatura apagada (online).");
+          })
+          .catch((e) => {
+            console.error(e);
+            showToast("Erro ao apagar viatura online.");
+          });
+        return;
+      }
+
+      // Firestore mas sem admin -> bloqueia
+      if (db && !isAdmin) {
+        showToast("Modo só leitura. Faça login como admin para apagar online.");
+        return;
+      }
+
+      // Sem Firestore: comportamento local
+      const idx = vehiclesData.indexOf(v);
+      if (idx === -1) return;
+      vehiclesData.splice(idx, 1);
+      saveVehiclesData();
+      applyFiltersVehicles();
+      showToast("Viatura apagada.");
+    }
+
+    function addVehicle() {
+      createOrEditVehicle(null);
     }
 
     if (searchVehiclesInput) {
@@ -1139,9 +2222,213 @@
       });
     });
 
+    // botão "Nova viatura" na barra superior
+    const vehiclesTopBar = document.querySelector("#tab-viaturas .top-bar");
+    if (vehiclesTopBar) {
+      const btnAddV = document.createElement("button");
+      btnAddV.type = "button";
+      btnAddV.id = "btnAddVehicle";
+      btnAddV.innerHTML =
+        '<i class="fa-solid fa-truck"></i><span style="margin-left:6px;">Nova viatura</span>';
+      btnAddV.style.borderRadius = "999px";
+      btnAddV.style.border = "1px solid var(--accent-strong)";
+      btnAddV.style.background = "var(--accent-soft)";
+      btnAddV.style.color = "var(--accent)";
+      btnAddV.style.padding = "6px 10px";
+      btnAddV.style.fontSize = "0.8rem";
+      btnAddV.style.display = "inline-flex";
+      btnAddV.style.alignItems = "center";
+      btnAddV.style.gap = "4px";
+      btnAddV.style.cursor = "pointer";
+      btnAddV.style.whiteSpace = "nowrap";
+      vehiclesTopBar.appendChild(btnAddV);
+
+      btnAddV.addEventListener("click", () => addVehicle());
+    }
+
+    
+    // Função de inicialização: se houver Firestore usa online, senão fica local
+    function initData() {
+      if (db) {
+        // CONTACTOS - listener em tempo real
+        db.collection("contacts")
+          .orderBy("nome")
+          .onSnapshot(
+            (snapshot) => {
+              const docs = snapshot.docs || [];
+              if (!docs.length && !contactsSeedDone && CONTACTS.length) {
+                // Se a coleção estiver vazia, envia CONTACTS iniciais uma única vez
+                contactsSeedDone = true;
+                const batch = db.batch();
+                CONTACTS.forEach((c) => {
+                  const ref = db.collection("contacts").doc();
+                  batch.set(ref, c);
+                });
+                batch
+                  .commit()
+                  .then(() =>
+                    console.log("CONTACTS iniciais enviados para Firestore.")
+                  )
+                  .catch((e) => console.error("Erro ao seed CONTACTS:", e));
+                return;
+              }
+              contactsData = docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              applyFiltersContacts();
+            },
+            (error) => {
+              console.error("Erro listener contacts:", error);
+              if (!contactsData.length) {
+                contactsData = loadContactsData();
+                applyFiltersContacts();
+              }
+            }
+          );
+
+        // VIATURAS - listener em tempo real
+        db.collection("vehicles")
+          .orderBy("matricula")
+          .onSnapshot(
+            (snapshot) => {
+              const docs = snapshot.docs || [];
+              if (!docs.length && !vehiclesSeedDone && VEHICLES.length) {
+                vehiclesSeedDone = true;
+                const batch = db.batch();
+                VEHICLES.forEach((v) => {
+                  const ref = db.collection("vehicles").doc();
+                  batch.set(ref, v);
+                });
+                batch
+                  .commit()
+                  .then(() =>
+                    console.log("VEHICLES iniciais enviados para Firestore.")
+                  )
+                  .catch((e) => console.error("Erro ao seed VEHICLES:", e));
+                return;
+              }
+              vehiclesData = docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              applyFiltersVehicles();
+            },
+            (error) => {
+              console.error("Erro listener vehicles:", error);
+              if (!vehiclesData.length) {
+                vehiclesData = loadVehiclesData();
+                applyFiltersVehicles();
+              }
+            }
+          );
+      } else {
+        // Sem Firestore: usa dados locais + localStorage
+        contactsData = loadContactsData();
+        vehiclesData = loadVehiclesData();
+        applyFiltersContacts();
+        applyFiltersVehicles();
+      }
+
+      // Criar/atualizar botão de login admin no header
+      
+    const header = document.querySelector("header");
+      if (header && !document.getElementById("adminLoginBtn")) {
+        // Zona mini de estado + botão admin
+        const adminWrap = document.createElement("div");
+        adminWrap.className = "admin-status-zone";
+        adminWrap.style.display = "flex";
+        adminWrap.style.alignItems = "center";
+        adminWrap.style.gap = "6px";
+        adminWrap.style.fontSize = "0.75rem";
+
+        const statusLabel = document.createElement("span");
+        statusLabel.id = "adminStatusLabel";
+        statusLabel.style.color = "var(--muted)";
+        statusLabel.textContent = isAdmin
+          ? "Modo: admin (pode editar)"
+          : "Modo: só leitura";
+
+        const adminBtn = document.createElement("button");
+        adminBtn.id = "adminLoginBtn";
+        adminBtn.type = "button";
+        adminBtn.textContent = "Login admin";
+        adminBtn.style.borderRadius = "999px";
+        adminBtn.style.border = "1px solid var(--accent-strong)";
+        adminBtn.style.background = "var(--accent-soft)";
+        adminBtn.style.color = "var(--accent)";
+        adminBtn.style.padding = "4px 10px";
+        adminBtn.style.fontSize = "0.75rem";
+        adminBtn.style.cursor = "pointer";
+        adminBtn.style.whiteSpace = "nowrap";
+
+        function updateAdminBtn() {
+          if (isAdmin) {
+            adminBtn.textContent = "Admin ligado (logout)";
+            adminBtn.style.background = "var(--accent)";
+            adminBtn.style.color = "#fff";
+            statusLabel.textContent = "Modo: admin (pode editar)";
+            statusLabel.style.color = "var(--accent)";
+          } else {
+            adminBtn.textContent = "Login admin";
+            adminBtn.style.background = "var(--accent-soft)";
+            adminBtn.style.color = "var(--accent)";
+            statusLabel.textContent = "Modo: só leitura";
+            statusLabel.style.color = "var(--muted)";
+          }
+        }
+
+        adminBtn.addEventListener("click", () => {
+          if (!firebase || !firebase.auth) {
+            showToast("Firebase não disponível.");
+            return;
+          }
+
+          if (isAdmin) {
+            firebase
+              .auth()
+              .signOut()
+              .then(() => {
+                isAdmin = false;
+                showToast("Sessão admin terminada.");
+                updateAdminBtn();
+              })
+              .catch((e) => {
+                console.error(e);
+                showToast("Erro ao terminar sessão.");
+              });
+            return;
+          }
+
+          const email = prompt("Email de administrador:");
+          const password = prompt("Password de administrador:");
+          if (!email || !password) return;
+
+          firebase
+            .auth()
+            .signInWithEmailAndPassword(email.trim(), password)
+            .then(() => {
+              isAdmin = true;
+              showToast("Admin ligado.");
+              updateAdminBtn();
+            })
+            .catch((error) => {
+              console.error("Erro login admin:", error);
+              showToast("Login admin falhou.");
+            });
+        });
+
+        updateAdminBtn();
+        adminWrap.appendChild(statusLabel);
+        adminWrap.appendChild(adminBtn);
+        header.appendChild(adminWrap);
+      }
+
+    }
+
     // Inicial
-    applyFiltersContacts();
-    applyFiltersVehicles();
+    initData();
+
   </script>
 </body>
 </html>
